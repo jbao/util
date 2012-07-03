@@ -1,0 +1,9 @@
+Package: util
+Title: R utilities for data analysis
+Description: R utilities for data analysis
+URL: https://github.com/jbao/util
+Version: 0.1.0
+Maintainer: Jie Bao <jie.bao@frias.uni-freiburg.de>
+Author: Jie Bao <jie.bao@frias.uni-freiburg.de>
+Depends: R (>= 2.11.0)
+License: MIT
