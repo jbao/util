@@ -1,7 +1,15 @@
-# $Id: full_reduced.R 313 2012-05-10 08:26:08Z jbao $
-# requires predefinition of ctrl.tpoint and treated.tpoint
-lrtest <- function(core) {
-    #core <- c(as.numeric(ctrl), as.numeric(treated))
+#' Calculate the p-value of the likelihood-ratio test between the full and reduced
+#' model. 
+#'
+#' This function calculates the likelihood-ratio test p-value of comparing the
+#' full and reduced model fitting to the time series data.
+#'
+#' @param core the data vector, consists of time series under both conditions
+#' @param ctrl.tpoint time points of the control measurement
+#' @param treated.tpoint time points of the treatment measurement
+#' @export
+#' @return p-value
+lrtest <- function(core, ctrl.tpoint, treated.tpoint) {
     design.ctrl <- cbind(rep(1,length(ctrl.tpoint)), ctrl.tpoint, 
         ctrl.tpoint^2, ctrl.tpoint^3, matrix(0,nrow=length(ctrl.tpoint),ncol=4))
     design.treated <- cbind(matrix(0,nrow=length(treated.tpoint),ncol=4), 
@@ -20,7 +28,18 @@ lrtest <- function(core) {
     test$'Pr(>F)'[2]
 }
 
-fit.red <- function(core) {
+#' Fit the time series to a reduced model assuming no differential expression
+#' between conditions.
+#'
+#' This function fits the given time series to a reduced cubic polynomial model
+#' by assuming there is no differential expression between conditions
+#'
+#' @param core the data vector, consists of time series under both conditions
+#' @param ctrl.tpoint time points of the control measurement
+#' @param treated.tpoint time points of the treatment measurement
+#' @export
+#' @return the fitted curve
+fit.red <- function(core, ctrl.tpoint, treated.tpoint) {
     design.red <- cbind(rep(1,length(ctrl.tpoint)+length(treated.tpoint)), 
         c(ctrl.tpoint,treated.tpoint), c(ctrl.tpoint^2,treated.tpoint^2), 
         c(ctrl.tpoint^3,treated.tpoint^3))
@@ -29,7 +48,18 @@ fit.red <- function(core) {
     predict(mod.red)
 }
 
-fit.full <- function(core) {
+#' Fit the time series to a full model assuming differential expression
+#' between conditions.
+#'
+#' This function fits the given time series to a full cubic polynomial model
+#' by assuming there is differential expression between conditions
+#'
+#' @param core the data vector, consists of time series under both conditions
+#' @param ctrl.tpoint time points of the control measurement
+#' @param treated.tpoint time points of the treatment measurement
+#' @export
+#' @return the fitted curve
+fit.full <- function(core, ctrl.tpoint, treated.tpoint) {
     design.ctrl <- cbind(rep(1,length(ctrl.tpoint)), ctrl.tpoint, 
         ctrl.tpoint^2, ctrl.tpoint^3, matrix(0,nrow=length(ctrl.tpoint),ncol=4))
     design.treated <- cbind(matrix(0,nrow=length(treated.tpoint),ncol=4), 
