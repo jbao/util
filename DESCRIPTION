@@ -8,8 +8,9 @@ Author: Jie Bao <jie.bao@frias.uni-freiburg.de>
 Depends:
     R (>= 2.11.0)
 Imports:
-    sn
+    sn,minpack.lm,reshape
 License: MIT
 Collate:
     'full_reduced.R'
     'skewt.R'
+    'plot.R'

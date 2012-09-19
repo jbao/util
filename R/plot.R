@@ -110,7 +110,10 @@ fit.impulse <- function(tpoint, ts) {
     residFun <- function(p, observed, xx) observed - logistic(p,xx)
     ## starting values for parameters
     #parStart <- list(a=1, b=1, c=1, d=1)
-    parStart <- list(h1=2,h0=0,beta=-1,t1=1,h2=1,t2=2)
+    #if (abs(max(ts[1:8])) > abs(min(ts[1:8])))
+    #    parStart <- list(h1=2,h0=0,beta=-1,t1=1,h2=1,t2=2)
+    #else
+        parStart <- list(h1=-0.5,h0=0,beta=1,t1=1,h2=-1,t2=2)
     ## perform fit
     nls.out <- nls.lm(par=parStart, fn = residFun, observed = ts, xx = tpoint)
                                              
@@ -156,7 +159,8 @@ fit.impulse.param <- function(tpoint, ts) {
 #' @export
 plot.impulse <- function(treated, filename) {
     pdf(filename,8,11)
-    for (i in 1:ceiling(nrow(dat$dat)/12)) {
+    for (i in 1:ceiling(nrow(treated$dat)/12)) {
+    #for (i in 1:10) {
         symbol <- treated$dat$Gene
         slice <- seq((i-1)*12+1,i*12)
         slice <- slice[!(slice > nrow(treated$dat))]
@@ -186,7 +190,7 @@ plot.impulse <- function(treated, filename) {
         #names(fit.ctrl) <- symbol[slice]
         #fit.treated <- as.data.frame(full[-(1:length(ctrl$tpoint)),])
         #names(fit.treated) <- symbol[slice]
-        fit.treated <- apply(treated$dat[,-idx.treated],1,function(x) fit.impulse(treated$tpoint,x))
+        fit.treated <- apply(treated$dat[slice,-idx.treated],1,function(x) fit.impulse(treated$tpoint,x))
         names(fit.treated) <- symbol[slice]
 
         # get the p-value
@@ -211,10 +215,11 @@ plot.impulse <- function(treated, filename) {
         #fit.ctrl <- within(fit.ctrl, Gene <- factor(Gene, levels = symbol[slice]))
         #with(fit.ctrl, levels(Gene))
         
-        fit.treated <- transform(fit.treated, time=treated$tpoint)
+        nfit <- 100
+        xfit <- seq(0,max(treated$tpoint),length=nfit)
+        fit.treated <- transform(fit.treated, time=xfit)
         fit.treated <- melt(fit.treated, id.vars='time')
-        fit.treated <- transform(fit.treated, Gene=rep(symbol[slice],
-            each=length(treated$tpoint)))
+        fit.treated <- transform(fit.treated, Gene=rep(symbol[slice], each=nfit))
         fit.treated <- within(fit.treated, Gene <- factor(Gene, 
             levels = symbol[slice]))
         with(fit.treated, levels(Gene))
