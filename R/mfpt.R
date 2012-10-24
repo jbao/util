@@ -9,7 +9,8 @@
 #' @param filename filename
 #' @export
 get.mfpt.sp <- function(mfpt.mat, idmap, net, source.entrez, target.entrez) {
-    registerDoMC()
+    #require(doMC)
+    #registerDoMC()
     mfpt.sp <- foreach(i=1:length(source.entrez), .combine='rbind') %:%
         foreach(j=1:length(target.entrez), .combine='rbind') %dopar% {
             ii <- idmap$vertex[which(source.entrez[i] == idmap$entrez)] + 1
@@ -17,8 +18,9 @@ get.mfpt.sp <- function(mfpt.mat, idmap, net, source.entrez, target.entrez) {
             source.idx <- match(source.entrez[i], V(net)$gene)
             target.idx <- match(target.entrez[j], V(net)$gene)
             sp <- shortest.paths(net, source.idx, target.idx, weights=NA) # BFS
-            data.frame(mfpt=mfpt.mat[ii,jj], sp=sp,
-                source=get(source.entrez[i], org.Hs.egSYMBOL),
+            data.frame(mfpt=mfpt.mat[ii,jj], sp=as.numeric(sp),
+                #source=get(source.entrez[i], org.Hs.egSYMBOL),
+                source=idmap$official[which(source.entrez[j]==idmap$entrez)],
                 target=idmap$official[which(target.entrez[j]==idmap$entrez)])
     }
 }
